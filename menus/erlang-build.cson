@@ -1,0 +1,16 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  '.overlayer':
+      'Enable erlang-build': 'erlang-build:toggle'
+
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'erlang-build'
+      'submenu': [
+        { 'label': 'Toggle', 'command': 'erlang-build:toggle' }
+      ]
+    ]
+  }
+]
