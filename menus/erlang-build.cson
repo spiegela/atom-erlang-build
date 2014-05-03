@@ -1,7 +1,7 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
 'context-menu':
   '.overlayer':
-      'Enable erlang-build': 'erlang-build:toggle'
+      'Enable erlang-build': 'erlang-build:compile'
 
 'menu': [
   {
@@ -9,7 +9,7 @@
     'submenu': [
       'label': 'erlang-build'
       'submenu': [
-        { 'label': 'Toggle', 'command': 'erlang-build:toggle' }
+        { 'label': 'Compile Project', 'command': 'erlang-build:compile' }
       ]
     ]
   }

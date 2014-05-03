@@ -1,13 +1,23 @@
-ErlangBuildView = require './erlang-build-view'
+{MessagePanelView, LineMessageView, PlainMessageView} = require 'atom-message-panel'
 
 module.exports =
-  erlangBuildView: null
+  messagePanelView: null
+
+  initialize: (serializeState) ->
+    atom.workspaceView.command "erlang-build:compile", =>
+      @compile()
+
 
   activate: (state) ->
-    @erlangBuildView = new ErlangBuildView(state.erlangBuildViewState)
+    @messagePanelView = new MessagePanelView
+      title: '<span class="icon-diff-added"></span> erlang-build'
+      rawTitle: true
+    @messagePanelView.attach()
 
   deactivate: ->
-    @erlangBuildView.destroy()
 
   serialize: ->
-    erlangBuildViewState: @erlangBuildView.serialize()
+
+  renderMessages: ->
+
+  compile: ->

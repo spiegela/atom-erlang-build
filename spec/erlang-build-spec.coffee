@@ -1,4 +1,5 @@
 {WorkspaceView} = require 'atom'
+path = require 'path'
 ErlangBuild = require '../lib/erlang-build'
 
 # Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
@@ -11,20 +12,18 @@ describe "ErlangBuild", ->
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView()
-    activationPromise = atom.packages.activatePackage('erlang-build')
+    activationPromise = (atom.packages.activatePackage 'erlang-build')
 
-  describe "when the erlang-build:toggle event is triggered", ->
-    it "attaches and then detaches the view", ->
-      expect(atom.workspaceView.find('.erlang-build')).not.toExist()
+  describe "when erlang-build:compile is triggered", ->
+    it "displays a message panel", ->
+      (expect (atom.workspaceView.find '.am-panel')).not.toExist()
 
       # This is an activation event, triggering it will cause the package to be
       # activated.
-      atom.workspaceView.trigger 'erlang-build:toggle'
+      atom.workspaceView.trigger 'erlang-build:compile'
 
       waitsForPromise ->
         activationPromise
 
       runs ->
-        expect(atom.workspaceView.find('.erlang-build')).toExist()
-        atom.workspaceView.trigger 'erlang-build:toggle'
-        expect(atom.workspaceView.find('.erlang-build')).not.toExist()
+        (expect (atom.workspaceView.find '.am-panel')).toExist()
