@@ -8,10 +8,12 @@ module.exports =
 
   configDefaults:
     compileOnSave: true
+    erlangPath: "/usr/local/bin"
+    rebarPath: "/usr/local/bin"
 
   activate: (state) ->
     atom.workspaceView.command "erlang-build:compile", => @compile()
-    process.env.PATH = "#{process.env.PATH}:/usr/local/bin"
+    @setupPathOptions()
     @setupCompileOnSave()
 
   deactivate: ->
@@ -20,7 +22,7 @@ module.exports =
 
   compile: ->
     @resetPanel()
-    proc = spawn "/usr/local/bin/rebar", ['compile'], cwd: atom.project.path
+    proc = spawn @rebarBin(), ['compile'], cwd: atom.project.path
     status = new CompileStatus
     proc.stdout.pipe status
     proc.stdout.on 'end',  () =>
@@ -30,6 +32,10 @@ module.exports =
           @displayMessage error for error in errors
         else
           @displayMessage "Application: #{app} compiled successfully."
+
+  setupPathOptions: ->
+    atom.config.observe 'erlang-build.erlangPath', {callNow: true}, (val) ->
+      process.env.PATH = "#{process.env.PATH}:#{val}"
 
   setupCompileOnSave: ->
     compileHandler = ->
@@ -60,3 +66,6 @@ module.exports =
       @messagePanelView.add new LineMessageView msg
     else
       console.log typeof msg
+
+  rebarBin: ->
+    Path.join (atom.config.get 'erlang-build.rebarPath'), 'rebar'
