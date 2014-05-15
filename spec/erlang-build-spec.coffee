@@ -34,13 +34,13 @@ describe "ErlangBuild", ->
         runs ->
           # this will help keep us in-synch since our compile process
           # is asynch and doesn't provide any promises to watch
-          @messagePanel =
-            (atom.packages.getActivePackage 'erlang-build').mainModule.messagePanelView
-          (spyOn @messagePanel, 'attach').andCallThrough()
+          @erlangBuild =
+            (atom.packages.getActivePackage 'erlang-build').mainModule
+          (spyOn @erlangBuild, 'resetPanel').andCallThrough()
 
         waitsFor ->
           # Our code calls the displayMessage method just once
-          @messagePanel.attach.callCount == 1
+          @erlangBuild.resetPanel.callCount == 1
 
       it "displays a message panel with successful compile messages", ->
         # Does the message panel exist?
@@ -60,9 +60,9 @@ describe "ErlangBuild", ->
       runs ->
         # this will help keep us in-synch since our compile process
         # is asynch and doesn't provide any promises to watch
-        @messagePanel =
-          (atom.packages.getActivePackage 'erlang-build').mainModule.messagePanelView
-        (spyOn @messagePanel, 'attach').andCallThrough()
+        @erlangBuild =
+          (atom.packages.getActivePackage 'erlang-build').mainModule
+        (spyOn @erlangBuild, 'resetPanel').andCallThrough()
 
     describe "after erlang-build:compile is triggered", ->
       beforeEach ->
@@ -70,7 +70,7 @@ describe "ErlangBuild", ->
 
       waitsFor ->
         # Our code calls the displayMessage method just once
-        @messagePanel.attach.callCount == 1
+        @erlangBuild.resetPanel.callCount == 1
 
       it "displays a message panel with errored compile messages", ->
         # Change path to our fixture of a malformed dummy app
