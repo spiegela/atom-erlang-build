@@ -32,6 +32,7 @@ module.exports =
           @displayMessage error for error in errors
         else
           @displayMessage "Application: #{app} compiled successfully."
+      @done()
 
   setupPathOptions: ->
     atom.config.observe 'erlang-build.erlangPath', {callNow: true}, (val) ->
@@ -50,14 +51,18 @@ module.exports =
       else
         atom.workspace.eachEditor (ed) -> ed.buffer.off 'saved', compileHandler
 
+  done: ->
+    console.log 'tasks completed'
+
   resetPanel: ->
-    if (atom.workspaceView.find '.am-panel').length != 1
+    if (atom.workspaceView.find '#erlang-build-mp').length > 0
+      @messagePanelView.clear()
+    else
       @messagePanelView = new MessagePanelView
         title: '<span class="icon-diff-added"></span> erlang-build'
         rawTitle: true
+      @messagePanelView.attr 'id', 'erlang-build-mp'
       @messagePanelView.attach()
-    else
-      @messagePanelView.clear()
 
   displayMessage: (msg) ->
     if typeof msg == "string"

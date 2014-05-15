@@ -22,7 +22,7 @@ describe "ErlangBuild", ->
     describe "before erlang-build:compile is triggered", ->
       it "has no message panel", ->
         # Test the "before" state of our message panel
-        (expect (atom.workspaceView.find '.am-panel')).not.toExist()
+        (expect (atom.workspaceView.find '#erlang-build-mp')).not.toExist()
 
     describe "after erlang-build:compile is triggered", ->
       beforeEach ->
@@ -36,15 +36,15 @@ describe "ErlangBuild", ->
           # is asynch and doesn't provide any promises to watch
           @erlangBuild =
             (atom.packages.getActivePackage 'erlang-build').mainModule
-          (spyOn @erlangBuild, 'resetPanel').andCallThrough()
+          (spyOn @erlangBuild, 'done').andCallThrough()
 
         waitsFor ->
           # Our code calls the displayMessage method just once
-          @erlangBuild.resetPanel.callCount == 1
+          @erlangBuild.done.callCount > 0
 
       it "displays a message panel with successful compile messages", ->
         # Does the message panel exist?
-        (expect (atom.workspaceView.find '.am-panel')).toExist()
+        (expect (atom.workspaceView.find '#erlang-build-mp')).toExist()
         # Does it contain the correct content?
         (expect atom.workspaceView.find('.plain-message').text() ).
           toEqual "Application: dummy compiled successfully."
@@ -53,6 +53,7 @@ describe "ErlangBuild", ->
     beforeEach ->
       # Change path to our fixture of a well-formed dummy app
       atom.project.setPath (path.join __dirname, 'fixtures', 'apps', 'bad-dummy')
+      atom.workspaceView.trigger 'erlang-build:compile'
 
       waitsForPromise ->
         activationPromise
@@ -62,21 +63,21 @@ describe "ErlangBuild", ->
         # is asynch and doesn't provide any promises to watch
         @erlangBuild =
           (atom.packages.getActivePackage 'erlang-build').mainModule
-        (spyOn @erlangBuild, 'resetPanel').andCallThrough()
+        (spyOn @erlangBuild, 'done').andCallThrough()
 
     describe "after erlang-build:compile is triggered", ->
       beforeEach ->
         atom.workspaceView.trigger 'erlang-build:compile'
 
-      waitsFor ->
-        # Our code calls the displayMessage method just once
-        @erlangBuild.resetPanel.callCount == 1
+        waitsFor ->
+          # Our code calls the displayMessage method just once
+          @erlangBuild.done.callCount > 0
 
       it "displays a message panel with errored compile messages", ->
         # Change path to our fixture of a malformed dummy app
         atom.project.setPath (path.join __dirname, 'fixtures', 'apps', 'bad-dummy')
         # Does the message panel exist?
-        (expect (atom.workspaceView.find '.am-panel')).toExist()
+        (expect (atom.workspaceView.find '#erlang-build-mp')).toExist()
         # Does it contain the correct content?
-        (expect atom.workspaceView.find('.line-message').length).
-          toEqual 16
+        (expect atom.workspaceView.find('#erlang-build-mp .message').first().text()).
+          toEqual "syntax error before: terminate"
