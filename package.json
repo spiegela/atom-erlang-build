@@ -1,7 +1,7 @@
 {
   "name": "erlang-build",
   "main": "./lib/erlang-build",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Erlang Build Tools for Atom",
   "activationEvents": [
     "erlang-build:compile"
