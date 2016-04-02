@@ -4,73 +4,39 @@ Path = require 'path'
 CompileStatus = require './compile-status'
 
 module.exports =
-  messagePanelView: null
-
-  configDefaults:
-    compileOnSave: true
-    erlangPath: "/usr/local/bin"
-    rebarPath: "/usr/local/bin"
+config:
+    executablePath:
+      type: 'string'
+      title: 'Werl Executable Path'
+      default: 'C:/Program Files/erl7.2.1/bin/werl'
+    rebarPath:
+      type: 'string'
+      title: 'Rebar Path'
+      default: 'C:/rebar-master/rebar.cmd'
+    sname:
+      type: 'string'
+      title: 'sname'
+      default: 'server'
+    coockie:
+      type: 'string'
+      title: 'coockie'
+      default: 'class1'
 
   activate: (state) ->
-    atom.workspaceView.command "erlang-build:compile", => @compile()
-    @setupPathOptions()
-    @setupCompileOnSave()
+    atom.commands.add 'atom-workspace',
+    "erlang-build:compile": => @compile()
 
   deactivate: ->
 
   serialize: ->
 
   compile: ->
-    @resetPanel()
-    proc = spawn @rebarBin(), ['compile'], cwd: atom.project.path
-    status = new CompileStatus
-    proc.stdout.pipe status
-    proc.stdout.on 'end',  () =>
-      for app, errors of status.errors
-        if errors.length > 0
-          @displayMessage "Application: #{app} has compilation errors:"
-          @displayMessage error for error in errors
-        else
-          @displayMessage "Application: #{app} compiled successfully."
-      @done()
-
-  setupPathOptions: ->
-    atom.config.observe 'erlang-build.erlangPath', {callNow: true}, (val) ->
-      process.env.PATH = "#{process.env.PATH}:#{val}"
-
-  setupCompileOnSave: ->
-    compileHandler = ->
-      editor = atom.workspace.getActiveEditor()
-      if editor? and editor.getGrammar().name != 'Erlang' then return
-
-      atom.workspaceView.trigger 'erlang-build:compile'
-
-    atom.config.observe 'erlang-build.compileOnSave', {callNow: true}, (val) ->
-      if val
-        atom.workspace.eachEditor (ed) -> ed.buffer.on  'saved', compileHandler
-      else
-        atom.workspace.eachEditor (ed) -> ed.buffer.off 'saved', compileHandler
-
-  done: ->
-    console.log 'tasks completed'
-
-  resetPanel: ->
-    if (atom.workspaceView.find '#erlang-build-mp').length > 0
-      @messagePanelView.clear()
-    else
-      @messagePanelView = new MessagePanelView
-        title: '<span class="icon-diff-added"></span> erlang-build'
-        rawTitle: true
-      @messagePanelView.attr 'id', 'erlang-build-mp'
-      @messagePanelView.attach()
-
-  displayMessage: (msg) ->
-    if typeof msg == "string"
-      @messagePanelView.add new PlainMessageView message: msg
-    else if typeof msg == "object"
-      @messagePanelView.add new LineMessageView msg
-    else
-      console.log typeof msg
-
-  rebarBin: ->
-    Path.join (atom.config.get 'erlang-build.rebarPath'), 'rebar'
+    console.log atom.project.getPaths()[0]
+    ls = spawn 'C:/rebar-master/rebar.cmd', ['compile'],
+        cwd: atom.project.getPaths()[0]
+    erl = spawn atom.config.get 'erlang-build.executablePath', [],
+        cwd: "#{atom.project.getPaths()[0]}/ebin"
+# receive all output and process
+    ls.stdout.on 'data', (data) -> console.log data.toString().trim()
+# receive error messages and process
+    ls.stderr.on 'data', (data) -> console.log data.toString().trim()
