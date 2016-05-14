@@ -8,19 +8,11 @@ config:
     executablePath:
       type: 'string'
       title: 'Werl Executable Path'
-      default: 'C:/Program Files/erl7.2.1/bin/werl'
+      default: 'C:/'
     rebarPath:
       type: 'string'
       title: 'Rebar Path'
-      default: 'C:/rebar-master/rebar.cmd'
-    sname:
-      type: 'string'
-      title: 'sname'
-      default: 'server'
-    coockie:
-      type: 'string'
-      title: 'coockie'
-      default: 'class1'
+      default: 'C:/'
 
   activate: (state) ->
     atom.commands.add 'atom-workspace',
@@ -32,9 +24,10 @@ config:
 
   compile: ->
     console.log atom.project.getPaths()[0]
-    ls = spawn 'C:/rebar-master/rebar.cmd', ['compile'],
-        cwd: atom.project.getPaths()[0]
-    erl = spawn atom.config.get 'erlang-build.executablePath', [],
+    console.log atom.config.get 'erlang-build.rebarPath'
+    ls = spawn "#{atom.config.get 'erlang-build.rebarPath'}", ["compile"],
+        cwd: "#{atom.project.getPaths()[0]}"
+    erl = spawn "#{atom.config.get 'erlang-build.executablePath'}", [],
         cwd: "#{atom.project.getPaths()[0]}/ebin"
 # receive all output and process
     ls.stdout.on 'data', (data) -> console.log data.toString().trim()
