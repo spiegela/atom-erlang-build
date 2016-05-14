@@ -11,3 +11,6 @@ tool, so your program must use rebar.
 ## Settings
  * rebar path
  * werl path
+
+## Forked from
+[spiegela/atom-erlang-build](https://github.com/spiegela/atom-erlang-build)
